@@ -28,4 +28,8 @@ hs_err_pid*
 .vscode/
 
 # Build Folder
-.build/
+build/
+bin/
+
+# .gradle folder
+.gradle/
