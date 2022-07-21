@@ -1,5 +1,6 @@
 plugins {
    id 'java'
+   id "org.xbib.gradle.plugin.git" version "2.0.0"
 }
 
 java {
@@ -19,4 +20,64 @@ dependencies {
 test {
     ignoreFailures = true
     useJUnitPlatform()
+}
+
+task reports (dependsOn: ['test', 'javadoc'] ) {
+    group = "Reporting"
+    description  'Check that test & javadoc tasks are complete'
+}
+
+////// Copy to Website //////
+
+task clonePages() {
+    doLast {
+        mkdir 'build/gh-pages'
+        def thisRepo = rootProject.projectDir.toString()
+        def pagesDir = "$buildDir/gh-pages"
+        project.delete {
+            delete pagesDir
+        }
+        def grgit = git.clone {
+            dir = pagesDir
+            uri = 'file:' + thisRepo
+            bare = false
+            refToCheckout = 'gh-pages'
+        }
+        grgit.checkout {
+            branch = 'gh-pages'
+        }
+        grgit.close()
+    }
+}
+
+task copyPages (dependsOn: ['reports', 'clonePages']) {
+    doLast {
+        // copy the build/docs/ directory, and all its contents, to the docs/ directory in your gh-pages branch.
+        ant.copy (todir: 'build/gh-pages/docs') {
+            fileset(dir: 'build/docs')
+        }
+        // copy the build/reports/ directory, and all its contents, to the reports/ directory in your gh-pages branch.  
+        ant.copy (todir: 'build/gh-pages/reports') {
+            fileset(dir: 'build/reports')
+        }
+    }
+}
+
+task deployReports (dependsOn: 'copyPages') {
+    group = "Reporting"
+    description  'Copies reports to the gh-pages branch in preparation for a future push to GitHub'
+    // commit all changes to your gh-pages branch.
+    doLast {
+        def pagesDir = "$buildDir/gh-pages"
+        def grgit = git.open {
+            dir = pagesDir + "/.git"
+        }
+        grgit.add (update: false, patterns: ['reports/'])
+        grgit.add (update: true, patterns: ['reports/'])
+        grgit.commit {
+            message = "Updating web pages"
+        }
+        // grgit.push {}
+        // grgit.close()
+    }
 }
