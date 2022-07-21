@@ -33,3 +33,6 @@ bin/
 
 # .gradle folder
 .gradle/
+
+# expection for the gradle-wrapper.jar
+! gradle/wrapper/gradle-wrapper.jar
