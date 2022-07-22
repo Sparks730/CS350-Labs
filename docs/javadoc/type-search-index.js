@@ -1,0 +1,1 @@
+typeSearchIndex = [{"l":"All Classes","url":"allclasses-index.html"},{"p":"edu.odu.cs","l":"Highway"},{"p":"edu.odu.cs","l":"Interval"},{"p":"edu.odu.cs","l":"Ranges"}]
