@@ -25,24 +25,19 @@ test {
     useJUnitPlatform()
 }
 
-task reports (dependsOn: ['test', 'javadoc'] ) {
-    group = "Reporting"
-    description  'Check that test & javadoc tasks are complete'
-}
-
 ////// Copy to Website //////
 
 task clonePages() {
     doLast {
         mkdir 'build/gh-pages'
-        def thisRepo = rootProject.projectDir.toString()
+        def thisRepo = "git@github.com:Sparks730/GitLab2.git"
         def pagesDir = "$buildDir/gh-pages"
         project.delete {
             delete pagesDir
         }
         def grgit = git.clone {
             dir = pagesDir
-            uri = 'file:' + thisRepo
+            uri = thisRepo
             bare = false
             refToCheckout = 'gh-pages'
         }
@@ -53,7 +48,7 @@ task clonePages() {
     }
 }
 
-task copyPages (dependsOn: ['reports', 'clonePages']) {
+task reports (dependsOn: ['test', 'javadoc', 'clonePages']) {
     doLast {
         // copy the build/docs/ directory, and all its contents, to the docs/ directory in your gh-pages branch.
         ant.copy (todir: 'build/gh-pages/docs') {
@@ -66,7 +61,7 @@ task copyPages (dependsOn: ['reports', 'clonePages']) {
     }
 }
 
-task deployReports (dependsOn: 'copyPages') {
+task deployReports (dependsOn: 'reports') {
     group = "Reporting"
     description  'Copies reports to the gh-pages branch in preparation for a future push to GitHub'
     // commit all changes to your gh-pages branch.
@@ -82,7 +77,6 @@ task deployReports (dependsOn: 'copyPages') {
         grgit.commit {
             message = "Updating web pages"
         }
-        // grgit.push {}
         grgit.close()
     }
 }
