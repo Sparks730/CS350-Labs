@@ -1,5 +1,8 @@
 plugins {
    id 'java'
+   // Apply the application plugin to add support for building a CLI application in Java.
+   id 'application'
+   // Plugin to work with git
    id "org.xbib.gradle.plugin.git" version "2.0.0"
 }
 
@@ -74,10 +77,12 @@ task deployReports (dependsOn: 'copyPages') {
         }
         grgit.add (update: false, patterns: ['reports/'])
         grgit.add (update: true, patterns: ['reports/'])
+        grgit.add (update: false, patterns: ['docs/'])
+        grgit.add (update: true, patterns: ['docs/'])
         grgit.commit {
             message = "Updating web pages"
         }
         // grgit.push {}
-        // grgit.close()
+        grgit.close()
     }
 }
