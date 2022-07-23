@@ -77,6 +77,7 @@ task deployReports (dependsOn: 'reports') {
         grgit.commit {
             message = "Updating web pages"
         }
+        grgit.push {}
         grgit.close()
     }
 }
